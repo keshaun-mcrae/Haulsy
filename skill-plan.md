@@ -1,6 +1,8 @@
 # Haulsy — Skill Plan
 
-Mobile-first marketplace for Surrey, BC (Furniture / Electronics / Appliances + Cars) with clean UI, chat translation toggle, and future AR “Will it fit?”.
+Mobile-first marketplace for the **Lower Mainland (Metro Vancouver)** — Vancouver, Surrey, Langley, Delta, Burnaby, Richmond + nearby — focused on **Furniture / Electronics / Appliances + Cars** with clean UI, built-in delivery gigs, chat translation toggle, and **AI Seller Autopilot**.
+
+**Wedge:** bulky local items where **speed + logistics** decide the sale.
 
 ---
 
@@ -9,18 +11,26 @@ Mobile-first marketplace for Surrey, BC (Furniture / Electronics / Appliances + 
 **User triggers:**
 - “I want to sell my couch”
 - “Find a used TV near me”
-- “Show me appliances in Surrey”
+- “Show me appliances near me”
 - “Is this still available?”
+- “Request delivery”
+- “Earn money delivering items”
+- “Turn on Autopilot for this listing”
 - “Can you translate this chat?”
-- “Will this fit in my room?”
+- “Will this fit in my room?” (later)
 
 **Core workflows**
-1. Buyer opens app → browses categories (Furniture/Electronics/Appliances/Cars)
-2. Buyer opens listing → taps **Message** → quick chips (availability, offer, pickup time)
-3. Seller replies in chat (optional **Translate 🌐 toggle** inside chat header)
-4. Buyer proposes meetup/pickup time → seller confirms
-5. Seller marks item **Sold** / archives listing
-6. (Later) Buyer uses **AR Fit Check** (v0 dimensions → v1 AR bounding box)
+1. Seller posts listing (photos → AI draft title/category/price → publish)
+2. Buyers browse/search by location + category
+3. Buyers message seller → quick chips (availability, offer, pickup time, delivery)
+4. **AI Seller Autopilot** replies instantly, qualifies buyers, and negotiates within seller rules
+5. Pickup or delivery is scheduled → item marked **Pending**
+6. Handoff happens → seller marks **Sold** (buyer confirms)
+7. (Later) **AR Fit Check** for furniture (v0 dimensions → v1 AR bounding box)
+
+**Autopilot guardrails (v1)**
+- Seller sets rules: min price / firm price, pickup windows, delivery allowed, auto-pending behavior
+- Autopilot can require seller approval before final price/time or before marking “pending/sold”
 
 ---
 
@@ -28,13 +38,15 @@ Mobile-first marketplace for Surrey, BC (Furniture / Electronics / Appliances + 
 
 | Type | File/Folder | Purpose |
 |------|-------------|---------|
-| **assets/** | `assets/preview.png` | Screenshots / UI references |
-| **references/** | `references/trust-safety.md` | Scam patterns, safety copy, meetup tips |
-| **docs/** | `docs/*` | Product specs (flows, UI system, data model, translation, AR) |
+| **assets/** | `assets/preview.png` | UI screenshots / references |
+| **references/** | `references/trust-safety.md` | Scam patterns + safety copy |
+| **docs/** | `docs/*` | PRD, UX flows, architecture, analytics |
 | **product/** | `product/backlog.md` | Master checklist + milestones |
-| **supabase/** | `supabase/schema.sql` | DB schema (listings, chat, translations) |
+| **supabase/** | `supabase/schema.sql` | DB schema (listings, chat, delivery jobs, settings) |
 | **supabase/** | `supabase/policies.sql` | RLS rules |
+| **supabase/** | `supabase/storage-policies.sql` | Storage policies for listing images |
 | **supabase/functions/** | `translate-message.md` | Translation function spec |
+| **supabase/functions/** | `autopilot-reply.md` | Autopilot reply/negotiation spec |
 | **app/mobile/** | (later) | Expo app |
 
 ---
@@ -55,4 +67,3 @@ Haulsy/
 ├── supabase/
 └── app/
     └── mobile/
-s

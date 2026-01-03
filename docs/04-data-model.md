@@ -1,4 +1,4 @@
-# Data Model (Planned)
+s# Data Model (Planned)
 
 ## Tables
 - profiles (preferred_language)
