@@ -1,56 +1,94 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Tabs } from 'expo-router';
+import React from "react";
+import { Tabs } from "expo-router";
+import { Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { HAULSY } from "@/constants/haulsyTheme";
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
+function TabIcon({
+  name,
+  color,
+}: {
+  name: React.ComponentProps<typeof Ionicons>["name"];
   color: string;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return <Ionicons name={name} size={24} color={color} />;
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
+        headerShown: false,
+        tabBarActiveTintColor: HAULSY.colors.primary,
+          tabBarInactiveTintColor: HAULSY.colors.icon,
+        tabBarStyle: {
+          height: 72,
+          paddingTop: 8,
+          borderTopWidth: 1,
+          borderTopColor: HAULSY.colors.border,
+          backgroundColor: HAULSY.colors.card,
+        },
+        tabBarLabelStyle: { fontSize: 12, marginTop: 2 },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          title: "Home",
+          tabBarIcon: ({ color }) => <TabIcon name="home-outline" color={color} />,
         }}
       />
+
       <Tabs.Screen
-        name="sell"
+        name="chat"
         options={{
-          title: 'Sell',
-          tabBarIcon: ({ color }) => <TabBarIcon name="plus-square" color={color} />,
+          title: "Chat",
+          tabBarIcon: ({ color }) => <TabIcon name="chatbubble-outline" color={color} />,
         }}
       />
+
       <Tabs.Screen
-        name="inbox"
+        name="haulsyiq"
         options={{
-          title: 'Inbox',
-          tabBarIcon: ({ color }) => <TabBarIcon name="comments" color={color} />,
+          title: "",
+          tabBarButton: (props) => (
+            <Pressable
+              {...(props as any)}
+              style={({ pressed }) => ({
+                width: 56,
+                height: 56,
+                marginTop: -18,
+                borderRadius: 16,
+                backgroundColor: HAULSY.colors.primary,
+                alignItems: "center",
+                justifyContent: "center",
+                opacity: pressed ? 0.9 : 1,
+                shadowColor: "#000",
+                shadowOpacity: 0.15,
+                shadowRadius: 12,
+                shadowOffset: { width: 0, height: 8 },
+                elevation: 6,
+              })}
+            >
+              <Ionicons name="sparkles" size={24} color="#fff" />
+            </Pressable>
+          ),
         }}
       />
+
+      <Tabs.Screen
+        name="earn"
+        options={{
+          title: "Earn",
+          tabBarIcon: ({ color }) => <TabIcon name="cash-outline" color={color} />,
+        }}
+      />
+
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          title: "Profile",
+          tabBarIcon: ({ color }) => <TabIcon name="person-outline" color={color} />,
         }}
       />
     </Tabs>
