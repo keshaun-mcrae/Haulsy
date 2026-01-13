@@ -9,7 +9,9 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { HAULSY } from "@/constants/haulsyTheme";
-import { ListingCard, type Listing } from "@/components/haulsy";
+import { ListingCard } from "@/components/ListingCard";
+import { MOCK_LISTINGS } from "@/lib/mockListings";
+import { router } from "expo-router";
 
 // Brand palette (strict roles)
 const INK = "#111111";
@@ -20,93 +22,22 @@ const BORDER_SOFT = "#EEF2F7";
 const BLUE = "#1E6BFF";
 const PURPLE = "#7C3AED";
 
-const LISTINGS: Listing[] = [
-  {
-    id: "1",
-    title: "IKEA Kallax Shelf (white)",
-    price: 60,
-    city: "Surrey",
-    minutesAgo: 12,
-    badge: "Good",
-    image:
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "2",
-    title: "Nintendo Switch + 2 games",
-    price: 280,
-    city: "Vancouver",
-    minutesAgo: 35,
-    badge: "Like New",
-    image:
-      "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "3",
-    title: "Sectional Sofa (delivery avail.)",
-    price: 350,
-    city: "Burnaby",
-    minutesAgo: 55,
-    badge: "Fair",
-    image:
-      "https://images.unsplash.com/photo-1549187774-b4e9b0445b41?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "4",
-    title: "MacBook Pro 14” (M2)",
-    price: 1450,
-    city: "Richmond",
-    minutesAgo: 80,
-    badge: "Good",
-    image:
-      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "5",
-    title: "Vintage floor lamp (brass)",
-    price: 45,
-    city: "Coquitlam",
-    minutesAgo: 8,
-    badge: "Like New",
-    image:
-      "https://images.unsplash.com/photo-1543198126-a8ad8e47fb22?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "6",
-    title: "Road bike • tuned • size M",
-    price: 520,
-    city: "New West",
-    minutesAgo: 22,
-    badge: "Good",
-    image:
-      "https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "7",
-    title: "KitchenAid stand mixer",
-    price: 220,
-    city: "Vancouver",
-    minutesAgo: 65,
-    badge: "Good",
-    image:
-      "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "8",
-    title: "Navy wool coat (men’s L)",
-    price: 70,
-    city: "Burnaby",
-    minutesAgo: 41,
-    badge: "New",
-    image:
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=60",
-  },
-];
+const LISTINGS = MOCK_LISTINGS;
 
 const SEGMENTS = ["Sell", "For you", "Local", "Categories"] as const;
 
 export default function HomeScreen() {
-  const [segment, setSegment] = useState<(typeof SEGMENTS)[number]>("For you");
+  const [activeTab, setActiveTab] = useState<(typeof SEGMENTS)[number]>("For you");
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+
+  function toggleSave(id: string) {
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -118,7 +49,14 @@ export default function HomeScreen() {
         contentContainerStyle={styles.feedContent}
         columnWrapperStyle={styles.feedColumn}
         ItemSeparatorComponent={() => <View style={styles.feedSeparator} />}
-        renderItem={({ item }) => <ListingCard item={item} />}
+        renderItem={({ item }) => (
+          <ListingCard
+            listing={item}
+            onPress={() => router.push({ pathname: "/listing/[id]", params: { id: item.id } } as any)}
+            isSaved={savedIds.has(item.id)}
+            onToggleSave={() => toggleSave(item.id)}
+          />
+        )}
         ListHeaderComponent={
           <View style={styles.headerWrap}>
             {/* FB Marketplace-style header */}
@@ -143,10 +81,10 @@ export default function HomeScreen() {
               contentContainerStyle={styles.segmentRow}
               renderItem={({ item }) => {
                 const label = item as (typeof SEGMENTS)[number];
-                const active = segment === label;
+                const active = activeTab === label;
                 return (
                   <Pressable
-                    onPress={() => setSegment(label)}
+                    onPress={() => setActiveTab(label)}
                     style={({ pressed }) => [
                       styles.segmentItem,
                       active && styles.segmentActive,
@@ -256,17 +194,22 @@ const styles = StyleSheet.create({
     height: 34,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 12,
+    paddingHorizontal: 13,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: BORDER,
     backgroundColor: "#FFFFFF",
   },
   segmentActive: {
-    backgroundColor: "rgba(30,107,255,0.12)",
-    borderColor: "rgba(30,107,255,0.28)",
+    backgroundColor: "rgba(30,107,255,0.10)",
+    borderColor: "rgba(30,107,255,0.25)",
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
-  segmentText: { fontSize: 13, fontWeight: "600" },
+  segmentText: { fontSize: 14, fontWeight: "600" },
   segmentTextActive: { color: BLUE },
   segmentTextInactive: { color: INK },
 
